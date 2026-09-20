@@ -42,7 +42,7 @@ NOTES
 - Sidebar buttons highlight the active application, matching the
   reference calculator app's light-blue card style.
 
-TEST CASES AND EXPECTED RESULTS
+TEST CASES AND EXPECTED RESULTSs
 ---------------------------------
 
 ### 1. Inverting Amplifier
