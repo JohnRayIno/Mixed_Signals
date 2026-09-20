@@ -45,7 +45,7 @@ public enum CircuitType {
             new String[]{"Iin (mA)", "Rf (kΩ)"},
             "Vout",
             "V",
-            "Vout = -Iin x Rf"
+            "Vout = Iin x Rf"
     ),
     V_TO_I(
             "Voltage to Current",
@@ -97,7 +97,7 @@ public enum CircuitType {
             }
             case I_TO_V: {
                 double iin = v[0], rf = v[1];
-                return -(iin * rf);
+                return iin * rf;
             }
             case V_TO_I: {
                 double vin = v[0], r1 = v[1];

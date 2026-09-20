@@ -168,26 +168,40 @@ public class CircuitDiagramPanel extends JPanel {
         int opX = 230, opY = 90, opW = 90, opH = 80;
         int minusY = opY + 20, plusY = opY + opH - 20;
 
-        label(g2, "Iin", 25, minusY - 8);
-        drawArrow(g2, 50, minusY, 90, minusY);
-        drawWire(g2, 90, minusY, opX, minusY);
-        dot(g2, 150, minusY);
+    
+        int nodeX = 150;
+        drawWire(g2, nodeX, minusY, opX, minusY);
+        dot(g2, nodeX, minusY);
 
-        drawWire(g2, 150, minusY, 150, 40);
-        drawWire(g2, 150, 40, opX + opW + 70, 40);
+    
+        int r = 15;
+        int srcTop = minusY + 40;
+        drawWire(g2, nodeX, minusY, nodeX, srcTop);
+        g2.drawOval(nodeX - r, srcTop, 2 * r, 2 * r);
+        drawArrow(g2, nodeX, srcTop + 7, nodeX, srcTop + 2 * r - 7);
+        drawWire(g2, nodeX, srcTop + 2 * r, nodeX, srcTop + 2 * r + 20);
+        drawGround(g2, nodeX, srcTop + 2 * r + 20);
+        label(g2, "Iin", nodeX - 45, srcTop + r + 5);
+
+    
+        drawWire(g2, nodeX, minusY, nodeX, 40);
+        drawWire(g2, nodeX, 40, opX + opW + 70, 40);
         drawResistorH(g2, opX + opW + 10, 40, 60, "Rf");
         drawWire(g2, opX + opW + 70, 40, opX + opW + 70, opY + opH / 2);
         drawWire(g2, opX + opW + 70, opY + opH / 2, opX + opW, opY + opH / 2);
 
+    
         drawWire(g2, opX - 40, plusY, opX, plusY);
         drawWire(g2, opX - 40, plusY, opX - 40, plusY + 30);
         drawGround(g2, opX - 40, plusY + 30);
 
         drawOpAmp(g2, opX, opY, opW, opH);
 
+    
         drawWire(g2, opX + opW, opY + opH / 2, opX + opW + 110, opY + opH / 2);
         label(g2, "Vout", opX + opW + 115, opY + opH / 2 + 5);
     }
+
 
     private void drawVtoI(Graphics2D g2) {
         int opX = 225, opY = 85, opW = 90, opH = 90;
