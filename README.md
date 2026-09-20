@@ -31,18 +31,17 @@ APPLICATIONS INCLUDED
 2. Non-Inverting Amplifier        Vout = (1 + Rf/R1) x Vin
 3. Differential Amplifier         Vout = (Rf/R1) x (V2 - V1)
 4. Integrator Circuit             Vout = -(Vin x t)/(R x C)
-5. Current-to-Voltage Converter   Vout = -Iin x Rf
+5. Current-to-Voltage Converter   Vout = Iin x Rf
 6. Voltage-to-Current Converter   Iout = Vin/R1
 
 NOTES
 ------
 - Window is fixed-size (setResizable(false)) per the requirement.
-- Each application has its own hand-drawn circuit diagram (Graphics2D),
+- Each application has its own drawn circuit diagram (Graphics2D),
   so there are no external image files to lose or repath.
-- Sidebar buttons highlight the active application, matching the
-  reference calculator app's light-blue card style.
+- Sidebar buttons highlight the active application.
 
-TEST CASES AND EXPECTED RESULTSs
+TEST CASES AND EXPECTED RESULTS
 ---------------------------------
 
 ### 1. Inverting Amplifier
@@ -96,7 +95,7 @@ $V_{out}(t) = -\frac{1}{R \times C} \int V_{in}\,dt = -\frac{V_{in} \times t}{R 
 
 ### 5. Current-to-Voltage Converter (Transimpedance)
 
-Formula: $V_{out} = -I_{in} \times R_f$
+Formula: $V_{out} = I_{in} \times R_f$
 
 | Test Case | $I_{in}$ (mA) | $R_f$ (kΩ) | Expected $V_{out}$ |
 |---|---:|---:|---|
