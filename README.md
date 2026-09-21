@@ -29,7 +29,7 @@ APPLICATIONS INCLUDED
 -----------------------
 1. Inverting Amplifier            Vout = -(Rf/Rin) x Vin
 2. Non-Inverting Amplifier        Vout = (1 + Rf/R1) x Vin
-3. Differential Amplifier         Vout = (Rf/R1) x (V2 - V1)
+3. Differential Amplifier         Vout = ((R1 + Rf)/R1) x (R3/(R2 + R3)) x V2 - (Rf/R1) x V1
 4. Integrator Circuit             Vout = -(Vin x t)/(R x C)
 5. Current-to-Voltage Converter   Vout = Iin x Rf
 6. Voltage-to-Current Converter   Iout = Vin/R1
@@ -70,15 +70,15 @@ Formula: $V_{out} = \left(1 + \frac{R_f}{R_1}\right) \times V_{in}$
 
 ### 3. Differential Amplifier
 
-Balanced formula: $V_{out} = \left(\frac{R_f}{R_1}\right) \times (V_2 - V_1)$
+General formula: $V_{out} = \left(\frac{R_1 + R_f}{R_1}\right)\left(\frac{R_3}{R_2 + R_3}\right)V_2 - \frac{R_f}{R_1}V_1$
 
-| Test Case | $R_1$ (kΩ) | $R_f$ (kΩ) | $V_1$ (V) | $V_2$ (V) | Expected $V_{out}$ |
-|---|---:|---:|---:|---:|---|
-| Unity Difference | 10 | 10 | 1.0 | 3.5 | $V_{out} = 2.5$ V |
-| Amplified Difference | 10 | 100 | 2.0 | 2.5 | $V_{out} = 5$ V |
-| Negative Difference | 10 | 20 | 4.0 | 1.5 | $V_{out} = -5$ V |
-| Common Mode Signal | 10 | 50 | 3.3 | 3.3 | $V_{out} = 0$ V |
-| Zero Voltage Inputs | 10 | 100 | 0 | 0 | $V_{out} = 0$ V |
+| Test Case | $R_1$ (kΩ) | $R_f$ (kΩ) | $R_2$ (kΩ) | $R_3$ (kΩ) | $V_1$ (V) | $V_2$ (V) | Expected $V_{out}$ |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Unity Difference | 10 | 10 | 10 | 10 | 1.0 | 3.5 | $V_{out} = 2.5$ V |
+| Amplified Difference | 10 | 100 | 10 | 10 | 2.0 | 2.5 | $V_{out} = 5$ V |
+| Negative Difference | 10 | 20 | 10 | 10 | 4.0 | 1.5 | $V_{out} = -5$ V |
+| Common Mode Signal | 10 | 50 | 10 | 50 | 3.3 | 3.3 | $V_{out} = 0$ V |
+| Zero Voltage Inputs | 10 | 100 | 10 | 10 | 0 | 0 | $V_{out} = 0$ V |
 
 ### 4. Ideal Integrator
 
