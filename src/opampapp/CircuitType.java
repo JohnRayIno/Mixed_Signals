@@ -26,10 +26,10 @@ public enum CircuitType {
     DIFFERENTIAL(
             "Differential",
             "Differential Amplifier",
-            new String[]{"R1 (kΩ)", "Rf (kΩ)", "V1 (V)", "V2 (V)"},
+            new String[]{"R1 (kΩ)", "Rf (kΩ)", "R2 (kΩ)", "R3 (kΩ)", "V1 (V)", "V2 (V)"},
             "Vout",
             "V",
-            "Vout = (Rf / R1) x (V2 - V1)   [balanced: R1=R3, Rf=R2=R4]"
+            "Vout = ((R1 + Rf) / R1) x (R3 / (R2 + R3)) x V2 - (Rf / R1) x V1"
     ),
     INTEGRATOR(
             "Integrator",
@@ -37,7 +37,7 @@ public enum CircuitType {
             new String[]{"R (kΩ)", "C (µF)", "Vin (V)", "t (ms)"},
             "Vout",
             "V",
-            "Vout = -(Vin x t) / (R x C)   [constant Vin over time t]"
+            "Vout = Vout(0) - (1 / R x C) x integral(Vin(t) dt)"
     ),
     I_TO_V(
             "Current to Voltage",
@@ -88,8 +88,10 @@ public enum CircuitType {
                 return (1.0 + (rf / r1)) * vin;
             }
             case DIFFERENTIAL: {
-                double r1 = v[0], rf = v[1], v1 = v[2], v2 = v[3];
-                return (rf / r1) * (v2 - v1);
+                double r1 = v[0], rf = v[1], r2 = v[2], r3 = v[3];
+                double v1 = v[4], v2 = v[5];
+                return ((r1 + rf) / r1) * (r3 / (r2 + r3)) * v2
+                    - (rf / r1) * v1;
             }
             case INTEGRATOR: {
                 double r = v[0], c = v[1], vin = v[2], t = v[3];

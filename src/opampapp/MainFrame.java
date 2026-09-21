@@ -78,7 +78,7 @@ public class MainFrame extends JFrame {
 
     private JComponent buildContent() {
         contentPanel.setBackground(UITheme.CONTENT_BG);
-        contentPanel.setPreferredSize(new Dimension(700, 620));
+        contentPanel.setPreferredSize(new Dimension(760, 760));
         for (CircuitType type : CircuitType.values()) {
             contentPanel.add(new OpAmpPanel(type), type.name());
         }

@@ -14,6 +14,7 @@ public class OpAmpPanel extends JPanel {
     private final CircuitType type;
     private final JTextField[] fields;
     private final JLabel resultLabel;
+    private final IntegratorWaveformPanel waveformPanel;
     private static final DecimalFormat DF = new DecimalFormat("0.###");
 
     public OpAmpPanel(CircuitType type) {
@@ -38,8 +39,14 @@ public class OpAmpPanel extends JPanel {
         center.add(diagram);
         center.add(Box.createVerticalStrut(18));
 
-        JLabel formulaLabel = new JLabel(type.formula);
-        formulaLabel.setFont(UITheme.FONT_LABEL);
+        waveformPanel = type == CircuitType.INTEGRATOR ? new IntegratorWaveformPanel() : null;
+        if (waveformPanel != null) {
+            waveformPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            center.add(waveformPanel);
+            center.add(Box.createVerticalStrut(18));
+        }
+
+        JLabel formulaLabel = new JLabel(formattedFormula(type));
         formulaLabel.setForeground(new Color(0x50606E));
         formulaLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
         center.add(formulaLabel);
@@ -102,16 +109,60 @@ public class OpAmpPanel extends JPanel {
                         "Please enter a valid number for \"" + type.inputLabels[i] + "\".",
                         "Invalid Input", JOptionPane.WARNING_MESSAGE);
                 resultLabel.setText(" ");
+                if (waveformPanel != null) {
+                    waveformPanel.reset();
+                }
                 return;
             }
         }
         try {
             double result = type.compute(values);
             resultLabel.setText(type.resultName + " = " + DF.format(result) + " " + type.resultUnit);
+            if (waveformPanel != null) {
+                waveformPanel.setValues(values[2], result, values[3]);
+            }
         } catch (ArithmeticException ex) {
             JOptionPane.showMessageDialog(this,
                     "Calculation error: " + ex.getMessage(),
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private static String formattedFormula(CircuitType type) {
+        String fractionRfRin = fraction("R<sub>f</sub>", "R<sub>in</sub>");
+        String fractionRfR1 = fraction("R<sub>f</sub>", "R<sub>1</sub>");
+
+        switch (type) {
+            case INVERTING:
+                return html("V<sub>out</sub> = -" + fractionRfRin + " × V<sub>in</sub>");
+            case NON_INVERTING:
+                return html("V<sub>out</sub> = (1 + " + fractionRfR1 + ") × V<sub>in</sub>");
+            case DIFFERENTIAL:
+                return html("V<sub>out</sub> = "
+                    + fraction("R<sub>1</sub> + R<sub>f</sub>", "R<sub>1</sub>") + " × "
+                    + fraction("R<sub>3</sub>", "R<sub>2</sub> + R<sub>3</sub>")
+                    + " × V<sub>2</sub> − " + fraction("R<sub>f</sub>", "R<sub>1</sub>")
+                    + " × V<sub>1</sub>");
+            case INTEGRATOR:
+                return html("V<sub>out</sub>(t) = V<sub>out</sub>(0) − "
+                        + fraction("1", "R × C") + " ∫ V<sub>in</sub>(t) dt"
+                        + "<br><span style='font-size:10px'>For constant V<sub>in</sub> over time t</span>");
+            case I_TO_V:
+                return html("V<sub>out</sub> = −I<sub>in</sub> × R<sub>f</sub>");
+            case V_TO_I:
+                return html("I<sub>out</sub> = " + fraction("V<sub>in</sub>", "R<sub>1</sub>"));
+            default:
+                throw new IllegalStateException("Unhandled circuit type: " + type);
+        }
+    }
+
+    private static String html(String content) {
+        return "<html><div style='font-family:Segoe UI;font-size:13px;white-space:nowrap'>"
+            + content + "</div></html>";
+    }
+
+    private static String fraction(String numerator, String denominator) {
+        return "<span style='white-space:nowrap'><sup>" + numerator + "</sup>&frasl;<sub>"
+            + denominator + "</sub></span>";
     }
 }
