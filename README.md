@@ -23,6 +23,7 @@ src/opampapp/
   UITheme.java              - shared colors/fonts
   CircuitType.java          - the 6 applications, their input fields, and formulas
   CircuitDiagramPanel.java  - hand-drawn schematic for each application
+  IntegratorWaveformPanel.java - Vin/Vout waveform plots (Integrator page only)
   OpAmpPanel.java           - diagram + inputs + Calculate button + result
 
 APPLICATIONS INCLUDED
@@ -64,7 +65,7 @@ Formula: $V_{out} = \left(1 + \frac{R_f}{R_1}\right) \times V_{in}$
 |---|---:|---:|---:|---|
 | Gain of 2 | 10 | 10 | 2.5 | $V_{out} = 5$ V |
 | Gain of 11 | 1 | 10 | 0.5 | $V_{out} = 5.5$ V |
-| Fractional Inputs | 2.2 | 10 | 0.33 | $V_{out} = 1.905$ V |
+| Fractional Inputs | 2.2 | 10 | 0.33 | $V_{out} = 1.83$ V |
 | Negative Input | 10 | 47 | -1.2 | $V_{out} = -6.84$ V |
 | Zero Input | 10 | 100 | 0 | $V_{out} = 0$ V |
 
@@ -75,8 +76,8 @@ General formula: $V_{out} = \left(\frac{R_1 + R_f}{R_1}\right)\left(\frac{R_3}{R
 | Test Case | $R_1$ (kΩ) | $R_f$ (kΩ) | $R_2$ (kΩ) | $R_3$ (kΩ) | $V_1$ (V) | $V_2$ (V) | Expected $V_{out}$ |
 |---|---:|---:|---:|---:|---:|---:|---|
 | Unity Difference | 10 | 10 | 10 | 10 | 1.0 | 3.5 | $V_{out} = 2.5$ V |
-| Amplified Difference | 10 | 100 | 10 | 10 | 2.0 | 2.5 | $V_{out} = 5$ V |
-| Negative Difference | 10 | 20 | 10 | 10 | 4.0 | 1.5 | $V_{out} = -5$ V |
+| Amplified Difference | 10 | 100 | 10 | 10 | 2.0 | 2.5 | $V_{out} = -6.25$ V |
+| Negative Difference | 10 | 20 | 10 | 10 | 4.0 | 1.5 | $V_{out} = -5.75$ V |
 | Common Mode Signal | 10 | 50 | 10 | 50 | 3.3 | 3.3 | $V_{out} = 0$ V |
 | Zero Voltage Inputs | 10 | 100 | 10 | 10 | 0 | 0 | $V_{out} = 0$ V |
 
@@ -88,7 +89,7 @@ $V_{out}(t) = -\frac{1}{R \times C} \int V_{in}\,dt = -\frac{V_{in} \times t}{R 
 | Test Case | $R$ (kΩ) | $C$ (μF) | $V_{in}$ (V) | Time $t$ (ms) | Expected $V_{out}$ |
 |---|---:|---:|---:|---:|---|
 | Standard Ramp | 10 | 1 | 1.0 | 10 | $V_{out} = -1$ V |
-| Fast Ramp | 10 | 0.1 | 0.5 | 1 | $V_{out} = -5$ V |
+| Fast Ramp | 10 | 0.1 | 0.5 | 1 | $V_{out} = -0.5$ V |
 | Negative Input Ramp | 10 | 1 | -2.0 | 5 | $V_{out} = 1$ V |
 | High Capacitance | 100 | 10 | 5.0 | 100 | $V_{out} = -0.5$ V |
 | Zero Input | 10 | 1 | 0 | 10 | $V_{out} = 0$ V |
@@ -99,10 +100,10 @@ Formula: $V_{out} = I_{in} \times R_f$
 
 | Test Case | $I_{in}$ (mA) | $R_f$ (kΩ) | Expected $V_{out}$ |
 |---|---:|---:|---|
-| Standard Signal | 1.0 | 10 | $V_{out} = -10$ V |
-| Microamp Signal | 0.05 | 100 | $V_{out} = -5$ V |
-| Negative Current Input | -0.2 | 22 | $V_{out} = 4.4$ V |
-| Small Fractional Input | 0.001 | 4.7 | $V_{out} = -0.0047$ V (-4.7 mV) |
+| Standard Signal | 1.0 | 10 | $V_{out} = 10$ V |
+| Microamp Signal | 0.05 | 100 | $V_{out} = 5$ V |
+| Negative Current Input | -0.2 | 22 | $V_{out} = -4.4$ V |
+| Small Fractional Input | 0.001 | 4.7 | $V_{out} = 0.0047$ V (4.7 mV) |
 | Zero Current Input | 0 | 10 | $V_{out} = 0$ V |
 
 ### 6. Voltage-to-Current Converter (Transconductance)
@@ -117,13 +118,19 @@ Formula: $I_{out} = \frac{V_{in}}{R_s}$
 | High Resistance Sense | 12.0 | 100.0 | $I_{out} = 0.12$ mA (120 μA) |
 | Zero Input | 0 | 10.0 | $I_{out} = 0$ mA |
 
-### 7. Global Input Validation and Error Handling
+### 7. Input Validation and Error Handling (current behavior)
 
-These cases apply across all GUI tabs.
+These cases apply across all GUI tabs. `OpAmpPanel.calculate()` only checks that each field
+parses as a number — it does not separately flag blank fields, negative values, or zero
+resistor/capacitor values.
 
-| Scenario / Test Case | Input Condition | Expected GUI Result |
+| Scenario / Test Case | Input Condition | Actual GUI Result |
 |---|---|---|
-| Division by Zero | Resistor $R = 0$ or capacitor $C = 0$ | Error dialog: “Resistance/Capacitance must be greater than 0.” |
-| Negative Component Values | $R < 0$ or $C < 0$ | Error dialog: “Component values cannot be negative.” |
-| Blank Field | Any field left empty | Error dialog: “Please fill in all fields.” |
-| Invalid Text | Inputs such as `10k`, `abc`, or `--5` | Error dialog: “Please enter valid numerical values.” |
+| Invalid Text | Inputs such as `10k`, `abc`, or `--5` (`Double.parseDouble` fails) | Warning dialog: “Please enter a valid number for "<field label>".” Result label is cleared. |
+| Blank Field | Any field left empty | Same as Invalid Text above — an empty string also fails `Double.parseDouble`. |
+| Negative Component Values | $R < 0$ or $C < 0$ | **Not rejected.** The value is parsed normally and used as-is in `compute()`. |
+| Division by Zero | Resistor $R = 0$ or capacitor $C = 0$ | **Not caught as an error.** Since all math uses `double`, dividing by 0 yields `Infinity` or `NaN` rather than throwing, so the result label shows `Infinity`/`NaN` instead of a dialog. |
+
+> Note: the code does catch `ArithmeticException` around the `compute()` call, but none of the
+> current formulas throw one (integer division isn't used), so that catch block is currently
+> unreachable in practice.
